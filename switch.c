@@ -78,7 +78,7 @@ void listen(){
   } else if(strcmp(cmd, "exit") == 0){
   exit(0);
   } else {
-    printf("Invalid command\n");
+    printf(" \033[1;31m Invalid command \033[0m\n");
   }
 }
  void init_port(port *portname, char name[5], int speed){

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
 
 // physical port
  typedef struct{
@@ -54,7 +54,9 @@ for(int i = 0; i < 6; i++)
 create_MAC_entry(1, MAC_table, "00:1A:2B:b6:4D:5F", 54);
   
   //show_MAC_table(MAC_table);
+  while (1) {
   listen();
+  }
 }
 
 void show_MAC_table(){
@@ -64,16 +66,21 @@ void show_MAC_table(){
   for(i = 0; i < 6; i++){
     printf("%-5d %-20s %-10s %-10s\n", MAC_table[i].Vlan, MAC_table[i].MAC, MAC_table[i].type == 0 ? "Dynamic" : "Static", MAC_table[i].port);
   }
-}
+  }
 
 // outputs the cli and get command
 void listen(){
   char cmd[100]; 
   printf("switch# ");
-  scanf("%[^\n]", cmd);
+  scanf(" %[^\n]", cmd);
   if(strcmp(cmd, "show mac_table") == 0){
   show_MAC_table(MAC_table);
-}}
+  } else if(strcmp(cmd, "exit") == 0){
+  exit(0);
+  } else {
+    printf("Invalid command\n");
+  }
+}
  void init_port(port *portname, char name[5], int speed){
  strcpy(portname->portName, name);
  portname->speed = speed;

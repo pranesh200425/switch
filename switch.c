@@ -33,14 +33,15 @@ table[portNum].Vlan = Vlan;
 strcpy(table[portNum].MAC, MAC);
 }
 
-void listen(char *cmd);
+void listen();
 
-void show_MAC_table(mac_row MAC_table[]);
+void show_MAC_table();
+
+mac_row MAC_table[6];
 
  void main() {
 port gigabit_one = {0};
 char ports[6][5] = {"G0/0", "G0/1", "F0/1", "F0/2", "F0/3", "F0/4"};
-mac_row MAC_table[6];
 int i ;
 for(i = 0; i < 6; i ++){
 MAC_table[i] = (mac_row){0};
@@ -52,10 +53,12 @@ for(int i = 0; i < 6; i++)
   create_MAC_entry(0, MAC_table, "00:1A:2B:3C:4D:5E", 13);
 create_MAC_entry(1, MAC_table, "00:1A:2B:b6:4D:5F", 54);
   
-  show_MAC_table(MAC_table);
+  //show_MAC_table(MAC_table);
+  listen();
 }
 
-void show_MAC_table(mac_row MAC_table[]){
+void show_MAC_table(){
+  printf("\n%-50s\n", "MAC Address Table");
   printf("%-5s %-20s %-10s %-10s\n", "Vlan", "MAC Address", "Type", "Port");
   int i = 0;
   for(i = 0; i < 6; i++){
@@ -63,9 +66,14 @@ void show_MAC_table(mac_row MAC_table[]){
   }
 }
 
-void listen(char *cmd){
-  printf("switch# %s", cmd);
-}
+// outputs the cli and get command
+void listen(){
+  char cmd[100]; 
+  printf("switch# ");
+  scanf("%[^\n]", cmd);
+  if(strcmp(cmd, "show mac_table") == 0){
+  show_MAC_table(MAC_table);
+}}
  void init_port(port *portname, char name[5], int speed){
  strcpy(portname->portName, name);
  portname->speed = speed;

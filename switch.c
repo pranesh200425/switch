@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 // physical port
  typedef struct{
-char portName[15]; //configurable portName
+char portName[5]; //configurable portName
  int speed; // speed in bytes
 int mode; // full or half duplex
 int switchport_mode; // 0 - access port, 1 - trunkport 
@@ -38,13 +39,19 @@ void listen();
 void show_MAC_table();
 
 mac_row MAC_table[6];
+port port_list[6];
+
+void switch_packet(int portNum, char Sour_MAC[17], char Dest_MAC[17]);
 
  void main() {
 port gigabit_one = {0};
 char ports[6][5] = {"G0/0", "G0/1", "F0/1", "F0/2", "F0/3", "F0/4"};
+
 int i ;
 for(i = 0; i < 6; i ++){
 MAC_table[i] = (mac_row){0};
+port_list[i] = (port){0};
+strcpy(port_list[i].portName, ports[i]);
   }
 
 for(int i = 0; i < 6; i++)
@@ -53,6 +60,11 @@ for(int i = 0; i < 6; i++)
   create_MAC_entry(0, MAC_table, "00:1A:2B:3C:4D:5E", 13);
 create_MAC_entry(1, MAC_table, "00:1A:2B:b6:4D:5F", 54);
   
+  
+
+  printf("Switch booting up...\n");
+  //printf("%s\n", port_list[0].portName);
+  sleep(3);
   //show_MAC_table(MAC_table);
   while (1) {
   listen();
@@ -77,7 +89,10 @@ void listen(){
   show_MAC_table(MAC_table);
   } else if(strcmp(cmd, "exit") == 0){
   exit(0);
-  } else {
+  } else if(strcmp(cmd, "switch packet") == 0){
+switch_packet(4, "11:1A:2B:3C:4D:5E", "00:1A:22:b6:4D:5F");
+  }
+  else {
     printf(" \033[1;31m Invalid command \033[0m\n");
   }
 }
@@ -96,5 +111,17 @@ void listen(){
 return 0;
  }
  return 1;
+}
+
+void switch_packet(int portNum, char Sour_MAC[12], char Dest_MAC[12]){
+ create_MAC_entry(portNum, MAC_table, Sour_MAC, 0);
+int i = 0;
+for(i = 0; i < 6; i++){
+  if(strcmp(MAC_table[i].MAC, Dest_MAC) == 0){
+      printf("Packet forwarded to port %s\n", MAC_table[i].port);
+      return;
+    }
+  }
+  printf("packet flooded to all port except incoming port\n");
 }
 
